@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9,IE=10,IE=11,IE=edge,chrome=1">
+    <title>征程——红军长征全景交互地图</title>
+    <script type="text/javascript" src="js/detector.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.skippr.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="data/timelineData.js"></script>
+    <script type="text/javascript" src="script/three.min.js"></script>
+    <script type="text/javascript" src="script/THREE.MeshLine.js"></script>
+    <script type="text/javascript" src="script/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script type="text/javascript" src="js/drag.js"></script>
+    <script type="text/javascript" src="js/jquery.skippr.js"></script>
+    <script type="text/javascript" src="script/TerrainLoader.js"></script>
+    <script type="text/javascript" src="script/minpubsub.js"></script>
+    <script type="text/javascript" src="script/world.js"></script>
+    <script type="text/javascript" src="script/tour.js"></script>
+    <script type="text/javascript" src="script/path.js"></script>
+    <script type="text/javascript" src="script/weather.js"></script>
+    <script type="text/javascript" src="script/main.js"></script>
+</head>
+
+<body>
+    <div class="mlogo">
+        <div class="mlg">
+            <img class="xlbg" src="img/mlogo.png">
+            <img class="smlogo" src="img/smlogo.png">
+            <div class="xlpts">
+                <div index="0" class="yudu jumpStation"></div>
+                <div index="1" class="xingan jumpStation"></div>
+                <div index="2" class="tongdao jumpStation"></div>
+                <div index="3" class="liping jumpStation"></div>
+                <div index="4" class="wujiang jumpStation"></div>
+                <div index="5" class="zunyi jumpStation"></div>
+                <div index="6" class="chishui jumpStation"></div>
+                <div index="7" class="jinshajiang jumpStation"></div>
+                <div index="8" class="daduhe jumpStation"></div>
+                <div index="9" class="luding jumpStation"></div>
+                <div index="10" class="xueshan jumpStation"></div>
+                <div index="11" class="caodi jumpStation"></div>
+                <div index="12" class="baozuo jumpStation"></div>
+                <div index="13" class="lazikou jumpStation"></div>
+                <div index="14" class="zhiluozhen jumpStation"></div>
+                <div index="15" class="ninghui jumpStation"></div>
+                <div index="16" class="jiangtai jumpStation"></div>
+            </div>
+        </div>
+    </div>
+    <div id="rendering"><div class="typing_loader"></div></div>
+    <!-- 删除视频播放相关代码，点击站点后动画播放完自动跳转到详情页 -->
+    <script type="text/javascript">
+    var __cur;
+    $(".mlogo .xlpts>div").on("click", function() {
+        $(".mlogo").hide();
+        var classname = $(this).attr("index");
+        __cur = parseInt(classname);
+        tour.currentPoint = __cur;
+        tour.moveTheme = "jump";
+        weather.currentWeather = tourData[__cur].weather;
+        weather.initial();
+        // 动画执行
+        if (typeof tour !== 'undefined' && typeof render === 'function') {
+            tour.create();
+            render();
+            // 动画结束后显示详情内容
+            if (typeof tour.onAnimationEnd === 'function') {
+                tour.onAnimationEnd(function() {
+                    showDetail(__cur);
+                });
+            } else {
+                setTimeout(function() {
+                    showDetail(__cur);
+                }, 2000); // 默认2秒后显示详情
+            }
+        } else {
+            showDetail(__cur);
+        }
+        // 地图高亮
+        $(".container .funcpart .smlmap .wrap .mapcontent .points .cent").removeClass("cent");
+        $(".container .funcpart .smlmap .wrap .mapcontent .points .pt").eq(__cur).addClass("cent");
+    });
+
+    // 展示详情内容（需根据你的项目实际内容完善）
+    function showDetail(index) {
+        // 隐藏地图和其他内容，只显示详情区
+        $(".container .funcpart").hide();
+        $(".container .ctrlpart").hide();
+        $("#thr").show();
+        // 根据index切换详情内容（示例：只显示对应图片和文字）
+        var stationNames = [
+            "于都", "兴安", "通道", "黎平", "瓮安", "遵义", "习水", "禄劝", "石棉", "泸定", "雪山", "草地", "包座", "腊子口", "直罗镇", "会宁", "将台堡"
+        ];
+        var stationDesc = [
+            "于都出发，开启长征序幕。", "兴安，突破封锁线。", "通道，召开紧急会议。", "黎平，战略转变。", "瓮安，强渡乌江。", "遵义，历史转折。", "习水，四渡赤水。", "禄劝，巧渡金沙江。", "石棉，强渡大渡河。", "泸定，飞夺泸定桥。", "雪山，翻越雪山。", "草地，征服草地。", "包座，打开甘南门户。", "腊子口，奇袭腊子口。", "直罗镇，粉碎围剿。", "会宁，会师胜利。", "将台堡，三军会合。"
+        ];
+        // 示例填充内容
+        $("#thr .p1 .text").html('<h2>' + stationNames[index] + '</h2><p>' + stationDesc[index] + '</p>');
+        // 可根据index切换图片等内容
+        // $("#thr .p1 .img img").attr("src", "images/xxx" + index + ".jpg");
+    }
+    </script>
+    </div>
+    <div id="container"></div>
+    <div class="container">
+        <!-- banner模块已删除 -->
+        <div class="corrept">
+            <div class="wrap1">
+                <div class="funcpart">
+                    <div class="jbh"></div>
+                    <div class="cwrap">
+                       <!--  <div class="renshu">
+                            <div class="u">
+                                <div class="level"></div>
+                            </div>
+                        </div> -->
+                        <!-- <div class="cx">
+                            <div class="lc">
+                                <div class="yb">
+                                    <div class="hb"></div>
+                                </div>
+                                <div class="km"></div>
+                                <div class="tl"></div>
+                            </div>
+                            <div class="sj">
+                                <div class="t">
+                                    <p class="text"><span class="tm"></span></p>
+                                </div>
+                                <div class="f">
+                                    <div class="f1"></div>
+                                    <div class="f2"></div>
+                                    <div class="f3"></div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="smlmap">
+                            <div class="smallmap ">
+                                <div class="wrap">
+                                    <div style="position: relative;">
+                                        <div class="mapcontent">
+                                            <div class="points"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="thr">
+                    <div class="p1">
+                        <div class="esp">
+                            <div class="t"><img></div>
+                            <div class="evn"><img src="img/p1_sj_yudu.png"></div>
+                            <div class="img"><img src=""></div>
+                            <div class="text"></div>
+                        </div>
+                        <div class="vr">
+                            <a class="play_vr" href="" target="_black"></a>
+                        </div>
+                        <div class="vr_t1"><img src="img/vr_t1.png"></div>
+                    </div>
+                    <div class="p2">
+                        <div class="news">
+                            <div class="t"><img src="img/title_news.png"></div>
+                            <div class="newslist">
+                            </div>
+                            <div class="pager">
+                            </div>
+                        </div>
+                        <div class="tips">
+                            <div class="t"><img src="img/title_tips.png"></div>
+                            <div class="twrap">
+                                <div class="nth"></div>
+                                <div class="list">
+                                    <div class="item">
+                                        <div class="qs">
+                                            <h2>question</h2></div>
+                                        <div class="opts">
+                                            <div class="optionA">A</div>
+                                            <div class="optionB">B</div>
+                                            <div class="optionC">C</div>
+                                            <div class="optionD">B</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pager">
+                                    <div class="prev">
+                                        &lt; </div>
+                                    <div class="cur"><span class="cl">01</span>/05</div>
+                                    <div class="next"> &gt; </div>
+                                </div>
+                            </div>
+                            <div class="rsltwrap">
+                                <img src="img/tips_result_all.png">
+                                <img src="img/tips_result_r1.png">
+                                <div class="rstext">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p3">
+                        <div class="zb">
+                            <div class="cv"><img src="img/zb_cv_yudu.png"></div>
+                            <div class="play"><img src="img/btn_play_p1.png"></div>
+                        </div>
+                        <div class="young">
+                            <div class="t"><img src="img/title_young.png"></div>
+                            <div class="text">
+                                <div class="jy"><img src="img/logo_l1.png"></div>
+                                <div class="p">
+                                    <p>《红色追寻》系列网络直播，以三个年轻人亲历的视角，亲身的体验，结合长征期间重大历史事件，综合运用各种网络传播元素，再现红军80多年前的艰苦历程。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ctrlpart">
+            <div class="zan ">
+                <form class="voteform" target="votebox">
+                    <input class="s1 btn" value="" readonly="">
+                    <input value="0" type="hidden" name="v16776">
+                    <input value="16776" type="hidden" name="id">
+                </form>
+                <div class="Num">
+                    <span class="eg">9425</span>
+                    <span class="c1">位网友</span>
+                    <br>
+                    <span class="c2">为长征精神点赞</span>
+                </div>
+            </div>
+            <div class="xh">
+                <form class="voteform" target="votebox">
+                    <input class="s1 btn" value="" readonly="">
+                    <input value="0" type="hidden" name="v16777">
+                    <input value="16777" type="hidden" name="id">
+                </form>
+
+                <div class="Num">
+                    <span class="eg">9937</span>
+                    <span class="c1">位网友</span>
+                    <br>
+                    <span class="c2">为长征先烈献花</span>
+                </div>
+            </div>
+            <div class="pl btn"></div>
+            <div class="plmask hide">
+                <div class="b">
+                    <!-- <iframe src="http://forum.home.news.cn/view/zt/201609cz/index.html"></iframe> -->
+                </div>
+            </div>
+
+            <div id="nextStation" class="moveCtr next">
+                <div class="b">进入下一站</div>
+            </div>
+        </div>
+    </div>
+    <div class="vrmask">
+        <div class="close"></div>
+        <div class="v"></div>
+    </div>
+    <div class="vdmask">
+        <div class="hov">
+            <div class="btns">
+                <div class="btn skip">
+                    <img src="img/vd_skip.png">
+                </div>
+            </div>
+        </div>
+        <div class="v"></div>
+    </div>
+    <div id="preStation" style="display: none;" class="moveCtr">前往上一个地点</div>
+    <script type="text/javascript" src="js/m.js"></script>
+    <div style="display:none">
+        <div id="fwl">010020050640000000000000011200000000000000</div>
+        <script type="text/javascript" src="http://webd.home.news.cn/webdig.js?z=1"></script>
+        <script type="text/javascript">
+        wd_paramtracker("_wdxid=010020050640000000000000011200000000000000")
+        </script>
+        <noscript><img src="../../../1.gif?z=1&_wdxid=010020050640000000000000011200000000000000" border="0"></noscript>
+    </div>
+    <div style="display:none">
+        <div id="fwl">010020050630000000000000011200000000000000</div>
+        <script type="text/javascript" src="http://webd.home.news.cn/webdig.js?z=1"></script>
+        <script type="text/javascript">
+        wd_paramtracker("_wdxid=010020050630000000000000011200000000000000")
+        </script>
+        <noscript><img src="../../../1-1.gif?z=1&_wdxid=010020050630000000000000011200000000000000" border="0"></noscript>
+    </div>
+    <img src="img/smlogo.png" id="center-logo" alt="Logo">
+</body>
+
+</html>
